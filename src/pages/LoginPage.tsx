@@ -6,7 +6,7 @@ interface LoginPageProps {
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
-  const [email, setEmail] = useState('john@kunwei.com');
+  const [email, setEmail] = useState('admin@kunwei.com');
   const [password, setPassword] = useState('demo');
   const [loading, setLoading] = useState(false);
 
