@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,11 +10,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
     @apply bg-ink-50 text-ink-900;
   }
   ::selection {
-    @apply bg-accent-200 text-accent-900;
+    @apply bg-teal-200 text-teal-900;
   }
 }
 

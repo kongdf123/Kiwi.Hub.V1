@@ -1,12 +1,20 @@
-export type Status = 'normal' | 'warning' | 'attention' | 'invalid' | 'offline' | 'processing' | 'syncing';
+export type Status = 'normal' | 'warning' | 'attention' | 'invalid' | 'offline' | 'processing' | 'syncing' | 'pending';
 
-export type Laterality = 'bilateral' | 'left' | 'right';
+export type SportCategory = 'Jumping' | 'Sprinting' | 'Strength' | 'Aquatic' | 'Endurance' | 'Agility';
 
-export type TestType = 'CMJ' | 'SJ' | 'IMTP' | 'Drop Jump' | 'Balance' | 'Sprint';
+export interface Sport {
+  id: string;
+  name: string;
+  nameCn: string;
+  icon: string;
+  category: SportCategory;
+  metrics: string[];
+}
 
 export interface Organization {
   id: string;
   name: string;
+  nameCn: string;
   country: string;
   timezone: string;
 }
@@ -14,7 +22,8 @@ export interface Organization {
 export interface Team {
   id: string;
   name: string;
-  sport: string;
+  nameCn: string;
+  sportId: string;
   season: string;
   athleteCount: number;
 }
@@ -22,6 +31,7 @@ export interface Team {
 export interface Group {
   id: string;
   name: string;
+  nameCn: string;
   type: string;
   description: string;
   athleteCount: number;
@@ -33,18 +43,19 @@ export interface Athlete {
   lastName: string;
   dateOfBirth: string;
   sex: 'M' | 'F';
-  sport: string;
+  sportId: string;
   position: string;
   teamId: string;
   groupIds: string[];
   status: Status;
   lastTestDate: string | null;
-  lastTestType: TestType | null;
+  lastTestProtocol: string | null;
   photoUrl: string | null;
   height: number;
   weight: number;
   baseline: Record<string, number>;
   personalBest: Record<string, number>;
+  tags: string[];
 }
 
 export interface Device {
@@ -56,17 +67,31 @@ export interface Device {
   battery: number;
   lastSync: string;
   location: string;
+  protocolSupport: string[];
 }
 
 export interface TestProtocol {
   id: string;
   name: string;
-  testType: TestType;
+  nameCn: string;
+  sportId: string;
   deviceType: string;
   trials: number;
-  metrics: string[];
+  metrics: ProtocolMetric[];
   validityRules: string[];
   description: string;
+  descriptionCn: string;
+  durationMin: number;
+  difficulty: 'basic' | 'standard' | 'advanced';
+}
+
+export interface ProtocolMetric {
+  key: string;
+  name: string;
+  nameCn: string;
+  unit: string;
+  primary: boolean;
+  threshold?: { warning: number; attention: number };
 }
 
 export interface Trial {
@@ -80,8 +105,9 @@ export interface Trial {
 export interface TestSession {
   id: string;
   athleteId: string;
+  protocolId: string;
   protocolName: string;
-  testType: TestType;
+  sportId: string;
   date: string;
   deviceSerial: string;
   operatorName: string;
@@ -90,6 +116,7 @@ export interface TestSession {
   summary: Record<string, number>;
   qualityFlag: 'valid' | 'questionable' | 'invalid';
   processingVersion: string;
+  source: 'device' | 'import' | 'api';
 }
 
 export interface User {
@@ -97,6 +124,7 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  roleCn: string;
   status: 'active' | 'inactive';
   teamAccess: string[];
   lastActive: string;
@@ -105,8 +133,8 @@ export interface User {
 export interface MetricDefinition {
   key: string;
   name: string;
+  nameCn: string;
   unit: string;
-  testType: TestType;
   primary: boolean;
   description: string;
 }
@@ -116,15 +144,53 @@ export interface TimelineEvent {
   date: string;
   type: 'testing' | 'training' | 'note';
   title: string;
-  testType?: TestType;
+  sportId?: string;
   metrics?: { name: string; value: number; unit: string }[];
   sessionId?: string;
 }
 
 export interface DashboardWidget {
   id: string;
-  type: 'metric-card' | 'trend-chart' | 'athlete-table' | 'distribution' | 'threshold' | 'asymmetry' | 'ranking';
+  type: 'metric-card' | 'trend-chart' | 'athlete-table' | 'distribution' | 'threshold' | 'asymmetry' | 'ranking' | 'sync-status';
   title: string;
+  titleCn: string;
   metric?: string;
   config: Record<string, string>;
 }
+
+export interface ImportJob {
+  id: string;
+  fileName: string;
+  source: 'csv' | 'excel' | 'api' | 'garmin' | 'whoop' | 'hawkin';
+  status: 'pending' | 'mapping' | 'processing' | 'completed' | 'failed';
+  progress: number;
+  totalRows: number;
+  processedRows: number;
+  matchedColumns: number;
+  unmatchedColumns: number;
+  createdAt: string;
+  sportId: string;
+}
+
+export interface Integration {
+  id: string;
+  name: string;
+  nameCn: string;
+  category: string;
+  icon: string;
+  status: 'connected' | 'disconnected' | 'error';
+  lastSync: string | null;
+  description: string;
+}
+
+export interface SyncLog {
+  id: string;
+  timestamp: string;
+  source: string;
+  direction: 'inbound' | 'outbound';
+  records: number;
+  status: 'success' | 'failed' | 'partial';
+  message: string;
+}
+
+export type Lang = 'en' | 'cn';

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { Toast } from '@/components/ui/Toast';
+import type { Lang } from '@/lib/types';
 
 interface AppContextValue {
   currentView: string;
@@ -10,6 +11,9 @@ interface AppContextValue {
   dismissToast: (id: string) => void;
   selectedTeamId: string;
   setSelectedTeamId: (id: string) => void;
+  lang: Lang;
+  setLang: (lang: Lang) => void;
+  t: (key: string) => string;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -19,6 +23,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [viewParams, setViewParams] = useState<Record<string, string>>({});
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState('team-1');
+  const [lang, setLang] = useState<Lang>('cn');
 
   const navigate = useCallback((view: string, params: Record<string, string> = {}) => {
     setCurrentView(view);
@@ -34,8 +39,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  const tFn = useCallback((key: string) => {
+    return key; // placeholder — pages use i18n.t directly with lang
+  }, []);
+
   return (
-    <AppContext.Provider value={{ currentView, navigate, viewParams, toasts, addToast, dismissToast, selectedTeamId, setSelectedTeamId }}>
+    <AppContext.Provider value={{ currentView, navigate, viewParams, toasts, addToast, dismissToast, selectedTeamId, setSelectedTeamId, lang, setLang, t: tFn }}>
       {children}
     </AppContext.Provider>
   );
