@@ -3,7 +3,7 @@ import type { Athlete, Device, Group, Organization, TestProtocol, TestSession, T
 export const DEMO_ORG: Organization = {
   id: 'org-1',
   name: 'Kunwei Performance Center',
-  nameCn: '昆维运动表现中心',
+  nameCn: '坤维运动中心',
   country: 'China',
   timezone: 'Asia/Shanghai',
 };
