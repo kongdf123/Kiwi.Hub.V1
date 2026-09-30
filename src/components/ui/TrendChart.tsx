@@ -7,7 +7,7 @@ interface TrendChartProps {
   showGrid?: boolean;
 }
 
-export function TrendChart({ data, unit = '', height = 180, color = '#3384fc', baseline, showGrid = true }: TrendChartProps) {
+export function TrendChart({ data, unit = '', height = 180, color = '#06b56b', baseline, showGrid = true }: TrendChartProps) {
   if (data.length === 0) {
     return <div style={{ height }} className="flex items-center justify-center text-ink-400 text-sm">No data yet</div>;
   }

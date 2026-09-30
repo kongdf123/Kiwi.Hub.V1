@@ -37,7 +37,7 @@ export function MetricCard({ label, value, unit, delta, deltaLabel, status = 'no
               <polyline
                 points={sparkData.map((v, i) => `${(i / (sparkData.length - 1)) * 60},${20 - ((v - Math.min(...sparkData)) / (Math.max(...sparkData) - Math.min(...sparkData) || 1)) * 16 - 2}`).join(' ')}
                 fill="none"
-                stroke={status === 'attention' ? '#f97316' : status === 'warning' ? '#fbbf24' : '#3384fc'}
+                stroke={status === 'attention' ? '#f97316' : status === 'warning' ? '#fbbf24' : '#06b56b'}
                 strokeWidth={1.5}
                 strokeLinecap="round"
               />

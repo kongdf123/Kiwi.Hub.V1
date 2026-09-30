@@ -23,12 +23,12 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 bg-ink-950 relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-accent-600 blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent-800 blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-teal-600 blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-kunwei-800 blur-3xl" />
         </div>
         <div className="relative z-10 flex flex-col justify-between p-12 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-accent-600 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-teal-500 flex items-center justify-center">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-semibold">Kunwei Hub</span>
@@ -56,7 +56,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       <div className="flex-1 flex items-center justify-center bg-ink-50 px-6">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2.5 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-accent-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <span className="text-lg font-semibold text-ink-900">Kunwei Hub</span>
@@ -74,7 +74,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2.5 text-sm bg-white border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 text-sm bg-white border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all"
                   required
                 />
               </div>
@@ -87,22 +87,22 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2.5 text-sm bg-white border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 text-sm bg-white border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all"
                   required
                 />
               </div>
             </div>
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-ink-600">
-                <input type="checkbox" defaultChecked className="rounded border-ink-300 text-accent-600 focus:ring-accent-400" />
+                <input type="checkbox" defaultChecked className="rounded border-ink-300 text-teal-600 focus:ring-teal-400" />
                 Remember me
               </label>
-              <button type="button" className="text-accent-600 hover:text-accent-700 font-medium">Forgot password?</button>
+              <button type="button" className="text-teal-600 hover:text-teal-700 font-medium">Forgot password?</button>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-accent-600 hover:bg-accent-700 text-white font-medium text-sm rounded-lg transition-colors disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-lg transition-colors disabled:opacity-60"
             >
               {loading ? 'Signing in...' : 'Sign In'}
               {!loading && <ArrowRight className="w-4 h-4" />}

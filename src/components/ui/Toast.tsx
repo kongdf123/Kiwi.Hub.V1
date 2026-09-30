@@ -24,7 +24,7 @@ const COLOR_MAP = {
   success: 'text-success-600',
   warning: 'text-warning-600',
   attention: 'text-attention-600',
-  info: 'text-accent-600',
+  info: 'text-teal-600',
 };
 
 export function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {

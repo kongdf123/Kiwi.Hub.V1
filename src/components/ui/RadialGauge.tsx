@@ -15,7 +15,7 @@ export function RadialGauge({
   label,
   unit = '',
   size = 120,
-  color = '#3384fc',
+  color = '#06b56b',
   warningThreshold,
   attentionThreshold,
 }: RadialGaugeProps) {

@@ -7,7 +7,7 @@ interface SparklineProps {
   strokeWidth?: number;
 }
 
-export function Sparkline({ data, width = 80, height = 24, color = '#3384fc', fill = true, strokeWidth = 1.5 }: SparklineProps) {
+export function Sparkline({ data, width = 80, height = 24, color = '#06b56b', fill = true, strokeWidth = 1.5 }: SparklineProps) {
   if (data.length < 2) return <div style={{ width, height }} />;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -19,7 +19,7 @@ export function Sparkline({ data, width = 80, height = 24, color = '#3384fc', fi
     return [x, y];
   });
   const path = points.map(([x, y]) => `${x},${y}`).join(' ');
-  const fillPath = `M0,${height} L${path.replaceAll(' ', ' L')} L${width},${height} Z`;
+  const fillPath = `M0,${height} L${path.split(' ').join(' L')} L${width},${height} Z`;
   const gradId = `spark-${color.replace('#', '')}`;
 
   return (

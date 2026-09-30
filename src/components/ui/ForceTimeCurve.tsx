@@ -33,8 +33,8 @@ export function ForceTimeCurve({ data, height = 240, bodyWeight = 780, showPhase
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ height }}>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#3384fc" stopOpacity={0.2} />
-          <stop offset="100%" stopColor="#3384fc" stopOpacity={0.02} />
+          <stop offset="0%" stopColor="#06b56b" stopOpacity={0.2} />
+          <stop offset="100%" stopColor="#06b56b" stopOpacity={0.02} />
         </linearGradient>
       </defs>
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
@@ -54,7 +54,7 @@ export function ForceTimeCurve({ data, height = 240, bodyWeight = 780, showPhase
         Body Weight
       </text>
       <path d={areaPath} fill={`url(#${gradId})`} />
-      <path d={linePath} fill="none" stroke="#3384fc" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke="#06b56b" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
       {showPhases && (
         <>
           <line x1={padding.left + chartW * 0.2} y1={padding.top} x2={padding.left + chartW * 0.2} y2={padding.top + chartH} stroke="#b1b8c8" strokeWidth={1} strokeDasharray="3 3" />

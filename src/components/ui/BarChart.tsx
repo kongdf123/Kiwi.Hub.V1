@@ -20,7 +20,7 @@ export function BarChart({ data, height = 200, unit = '', horizontal = false }: 
             <div className="flex-1 h-7 bg-ink-100 rounded-md overflow-hidden relative">
               <div
                 className="h-full rounded-md transition-all duration-500 animate-slide-right"
-                style={{ width: `${(d.value / max) * 100}%`, backgroundColor: d.color || '#3384fc' }}
+                style={{ width: `${(d.value / max) * 100}%`, backgroundColor: d.color || '#06b56b' }}
               />
               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-medium text-ink-700">
                 {d.value.toFixed(1)}{unit}

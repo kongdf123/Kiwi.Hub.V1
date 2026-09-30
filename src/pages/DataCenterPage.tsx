@@ -4,7 +4,7 @@ import { t as tr } from '@/lib/i18n';
 import { DEMO_IMPORTS, DEMO_SYNC_LOGS, getSport } from '@/lib/demo-data';
 import { TopBar } from '@/components/layout/TopBar';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { UploadCloud, FileText, CheckCircle, XCircle, RefreshCw, AlertTriangle, ArrowDown, ArrowUp, Database, HardDrive } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, XCircle, RefreshCw, AlertTriangle, ArrowDown, ArrowUp, Database, HardDrive, Clock } from 'lucide-react';
 import type { ImportJob } from '@/lib/types';
 
 const IMPORT_STATUS_CONFIG: Record<ImportJob['status'], { label: { en: string; cn: string }; color: string; icon: typeof CheckCircle }> = {
