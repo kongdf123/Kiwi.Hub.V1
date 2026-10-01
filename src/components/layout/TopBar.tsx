@@ -131,7 +131,7 @@ export function TopBar({ title, subtitle, actions }: TopBarProps) {
           {userMenuOpen && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-ink-200 py-1 z-20 animate-slide-up">
               <div className="px-3 py-2 border-b border-ink-100">
-                <p className="text-sm font-medium text-ink-900">John Smith</p>
+                <p className="text-sm font-medium text-ink-900">Li Wei</p>
                 <p className="text-xs text-ink-500">{lang === 'cn' ? '组织管理员' : 'Organization Admin'}</p>
               </div>
               <button onClick={() => { addToast(lang === 'cn' ? '个人资料（演示）' : 'Profile (demo)', 'info'); setUserMenuOpen(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-ink-50 transition-colors">
