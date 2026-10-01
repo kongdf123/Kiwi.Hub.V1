@@ -124,7 +124,7 @@ export function TopBar({ title, subtitle, actions }: TopBarProps) {
             className="flex items-center gap-2 p-1 pr-2 hover:bg-ink-50 rounded-lg transition-colors"
           >
             <div className="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-white text-sm font-medium">
-              JS
+              LW
             </div>
             <ChevronDown className="w-4 h-4 text-ink-400" />
           </button>
