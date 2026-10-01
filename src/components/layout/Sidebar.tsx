@@ -1,7 +1,7 @@
 import { useApp } from '@/lib/app-context';
 import { t as tr } from '@/lib/i18n';
 import { DEMO_ORG } from '@/lib/demo-data';
-import { Activity, Users, Dumbbell, Database, BarChart3, FileText, Settings, ChevronRight, FlaskConical, LayoutDashboard } from 'lucide-react';
+import { Activity, Users, ClipboardList, Database, BarChart3, FileText, Settings, ChevronRight, FlaskConical, LayoutDashboard, BookOpen } from 'lucide-react';
 import { StatusDot } from '@/components/ui/StatusBadge';
 
 export function Sidebar() {
@@ -10,7 +10,8 @@ export function Sidebar() {
   const navItems = [
     { view: 'home', label: tr('nav.home', lang), icon: LayoutDashboard },
     { view: 'athletes', label: tr('nav.athletes', lang), icon: Users },
-    { view: 'testing', label: tr('nav.testing', lang), icon: Dumbbell },
+    { view: 'sessions', label: tr('nav.sessions', lang), icon: ClipboardList },
+    { view: 'protocols', label: tr('nav.protocols', lang), icon: BookOpen },
     { view: 'data', label: tr('nav.data', lang), icon: Database },
     { view: 'dashboard', label: tr('nav.dashboard', lang), icon: BarChart3 },
     { view: 'reports', label: tr('nav.reports', lang), icon: FileText },
@@ -19,7 +20,8 @@ export function Sidebar() {
 
   const isActive = (view: string) => {
     if (view === 'athletes') return currentView === 'athletes' || currentView === 'athlete-profile';
-    if (view === 'testing') return currentView === 'testing' || currentView === 'test-result' || currentView === 'test-library';
+    if (view === 'sessions') return currentView === 'sessions' || currentView === 'session-detail';
+    if (view === 'protocols') return currentView === 'protocols';
     if (view === 'data') return currentView === 'data' || currentView === 'integrations' || currentView === 'sync-center';
     if (view === 'management') return currentView === 'management';
     return currentView === view;

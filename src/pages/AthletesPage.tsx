@@ -6,7 +6,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge, StatusDot } from '@/components/ui/StatusBadge';
 import { Sparkline } from '@/components/ui/Sparkline';
-import { Search, Filter, Download, UserPlus, Dumbbell, Zap, Waves, TrendingUp, Activity, Shuffle } from 'lucide-react';
+import { Search, Filter, Download, UserPlus, Zap, Waves, TrendingUp, Activity, Shuffle, ChevronRight } from 'lucide-react';
 import type { Athlete } from '@/lib/types';
 
 const SPORT_ICONS: Record<string, typeof Activity> = {
@@ -192,11 +192,11 @@ export function AthletesPage() {
                 align: 'right',
                 render: (a) => (
                   <button
-                    onClick={(e) => { e.stopPropagation(); navigate('testing', { athleteId: a.id }); }}
+                    onClick={(e) => { e.stopPropagation(); navigate('athlete-profile', { athleteId: a.id }); }}
                     className="p-1.5 text-ink-400 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
-                    title={tr('common.startTesting', lang)}
+                    title={tr('common.viewAll', lang)}
                   >
-                    <Dumbbell className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4" />
                   </button>
                 ),
               },

@@ -6,7 +6,7 @@ import { MetricCard } from '@/components/ui/MetricCard';
 import { StatusBadge, StatusDot } from '@/components/ui/StatusBadge';
 import { Sparkline } from '@/components/ui/Sparkline';
 import { TrendChart } from '@/components/ui/TrendChart';
-import { Dumbbell, AlertCircle, ArrowRight, Clock, Activity, Database, CheckCircle, AlertTriangle, RefreshCw, XCircle, Zap, Waves, TrendingUp, Shuffle } from 'lucide-react';
+import { Upload, AlertCircle, ArrowRight, Clock, Activity, Database, CheckCircle, AlertTriangle, RefreshCw, XCircle, Zap, Waves, TrendingUp, Shuffle } from 'lucide-react';
 
 const SPORT_ICONS: Record<string, typeof Activity> = {
   'sport-cmj': Activity,
@@ -46,11 +46,11 @@ export function HomePage() {
         subtitle={`${lang === 'cn' ? team.nameCn : team.name} · ${team.season} ${lang === 'cn' ? '赛季' : 'season'}`}
         actions={
           <button
-            onClick={() => navigate('testing')}
+            onClick={() => navigate('data')}
             className="flex items-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            <Dumbbell className="w-4 h-4" />
-            {tr('common.startTesting', lang)}
+            <Upload className="w-4 h-4" />
+            {tr('common.importData', lang)}
           </button>
         }
       />
@@ -132,7 +132,7 @@ export function HomePage() {
               return (
                 <button
                   key={session.id}
-                  onClick={() => navigate('test-result', { sessionId: session.id })}
+                  onClick={() => navigate('session-detail', { sessionId: session.id })}}
                   className="w-full flex items-center gap-4 px-5 py-3 hover:bg-ink-50 transition-colors text-left"
                 >
                   <div className="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center shrink-0">
