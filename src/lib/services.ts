@@ -12,14 +12,14 @@ import {
   DEMO_IMPORTS, DEMO_INTEGRATIONS, DEMO_USERS, DEMO_GROUPS, DEMO_ORG,
   getSessionsForAthlete, getTimelineForAthlete, getSport, getProtocol, getAthlete, getTeam,
   getResultForSession, getDataSource,
-} from '../demo-data';
-import { getMetric } from '../metrics';
+} from './demo-data';
+import { getMetric } from './metrics';
 import type {
   Athlete, TestProtocol, TestSession, Device, DataSource, Dataset,
   RawMeasurement, ProcessedMeasurement, SyncJob, SyncLog, Heartbeat,
   Result, ReportDefinition, DashboardWidget, Team, Sport, ImportJob,
   Integration, User, Group, Organization, TimelineEvent, SessionStatus,
-} from '../types';
+} from './types';
 
 // --- Async helper (simulates network latency) -----------------------------
 function delay<T>(data: T, ms = 120): Promise<T> {

@@ -107,7 +107,7 @@ export function TeamDashboardPage() {
               const athlete = DEMO_ATHLETES.find((a) => a.id === session.athleteId);
               if (!athlete) return null;
               return (
-                <button key={session.id} onClick={() => navigate('test-result', { sessionId: session.id })} className="w-full flex items-center gap-4 py-3 hover:bg-ink-50 -mx-2 px-2 rounded-lg transition-colors text-left">
+                <button key={session.id} onClick={() => navigate('session-detail', { sessionId: session.id })} className="w-full flex items-center gap-4 py-3 hover:bg-ink-50 -mx-2 px-2 rounded-lg transition-colors text-left">
                   <div className="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center shrink-0">
                     <Activity className="w-4 h-4 text-ink-500" />
                   </div>

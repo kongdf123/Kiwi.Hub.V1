@@ -6,7 +6,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge, StatusDot } from '@/components/ui/StatusBadge';
 import { Sparkline } from '@/components/ui/Sparkline';
-import { Search, Filter, Download, UserPlus, Zap, Waves, TrendingUp, Activity, Shuffle, ChevronRight } from 'lucide-react';
+import { Search, Filter, Download, UserPlus, Zap, Waves, TrendingUp, Activity, Shuffle, ChevronRight, Dumbbell } from 'lucide-react';
 import type { Athlete } from '@/lib/types';
 
 const SPORT_ICONS: Record<string, typeof Activity> = {

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useApp } from '@/lib/app-context';
 import { t as tr } from '@/lib/i18n';
 import { DEMO_SESSIONS, DEMO_ATHLETES, DEMO_PROTOCOLS, DEMO_DATA_SOURCES, getSport, getProtocol, getDataSource } from '@/lib/demo-data';
-import { getMetricLabel, getMetricUnit } from '@/lib/metrics';
+// metric labels handled inline via protocol definitions
 import { TopBar } from '@/components/layout/TopBar';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';

@@ -87,8 +87,8 @@ export function AthleteProfilePage() {
             <button onClick={() => navigate('athletes')} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-ink-700 bg-white border border-ink-200 hover:bg-ink-50 rounded-lg transition-colors">
               <ArrowLeft className="w-4 h-4" /> {tr('common.back', lang)}
             </button>
-            <button onClick={() => navigate('testing', { athleteId: athlete.id })} className="flex items-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors">
-              <Dumbbell className="w-4 h-4" /> {tr('common.newTest', lang)}
+            <button onClick={() => navigate('sessions', { athleteId: athlete.id })} className="flex items-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors">
+              <Calendar className="w-4 h-4" /> {tr('sessions.title', lang)}
             </button>
           </>
         }
@@ -246,7 +246,7 @@ export function AthleteProfilePage() {
                   return (
                     <button
                       key={session.id}
-                      onClick={() => navigate('test-result', { sessionId: session.id })}
+                      onClick={() => navigate('session-detail', { sessionId: session.id })}
                       className="w-full flex items-center gap-4 py-3 hover:bg-ink-50 -mx-2 px-2 rounded-lg transition-colors text-left"
                     >
                       <div className="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center shrink-0">
@@ -283,7 +283,7 @@ export function AthleteProfilePage() {
                     <div key={event.id} className="relative pl-12">
                       <div className="absolute left-2.5 top-1 w-3 h-3 rounded-full bg-teal-600 ring-4 ring-white" />
                       <button
-                        onClick={() => event.sessionId && navigate('test-result', { sessionId: event.sessionId })}
+                        onClick={() => event.sessionId && navigate('session-detail', { sessionId: event.sessionId })}
                         className="w-full text-left group"
                       >
                         <div className="flex items-center justify-between mb-1">

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useApp } from '@/lib/app-context';
 import { t as tr } from '@/lib/i18n';
 import { DEMO_SESSIONS, DEMO_ATHLETES, getSport, getProtocol, getDataSource, getResultForSession, DEMO_RAW_MEASUREMENTS, DEMO_PROCESSED_MEASUREMENTS } from '@/lib/demo-data';
-import { getMetricLabel, getMetricUnit } from '@/lib/metrics';
+// metric helpers defined locally to avoid lang-param mismatch with metrics.ts
 import { TopBar } from '@/components/layout/TopBar';
 import { ForceTimeCurve } from '@/components/ui/ForceTimeCurve';
 import { MetricCard } from '@/components/ui/MetricCard';

@@ -11,8 +11,6 @@ export const STRINGS: Record<string, { en: string; cn: string }> = {
   'nav.reports': { en: 'Reports', cn: '报告' },
   'nav.management': { en: 'Management', cn: '管理' },
   'nav.testLibrary': { en: 'Test Library', cn: '测试库' },
-  'nav.sessions': { en: 'Sessions', cn: '测试记录' },
-  'nav.protocols': { en: 'Protocols', cn: '方案库' },
   'nav.integrations': { en: 'Integrations', cn: '集成' },
   'nav.syncCenter': { en: 'Sync Center', cn: '同步中心' },
 
