@@ -1,49 +1,61 @@
+import { useState } from 'react';
 import { useApp } from '@/lib/app-context';
 import { t as tr } from '@/lib/i18n';
-import { DEMO_ATHLETES, DEMO_SESSIONS, DEMO_TEAMS, DEMO_DEVICES, DEMO_IMPORTS, DEMO_SYNC_LOGS, getSessionsForAthlete, getSport } from '@/lib/demo-data';
+import {
+  DEMO_ATHLETES, DEMO_SESSIONS, DEMO_PROTOCOLS, DEMO_DEVICES, DEMO_IMPORTS,
+  DEMO_SYNC_JOBS, DEMO_DATA_SOURCES, DEMO_RAW_MEASUREMENTS,
+  getSessionsForAthlete, getSport, getProtocol,
+} from '@/lib/demo-data';
 import { TopBar } from '@/components/layout/TopBar';
 import { MetricCard } from '@/components/ui/MetricCard';
 import { StatusBadge, StatusDot } from '@/components/ui/StatusBadge';
-import { Sparkline } from '@/components/ui/Sparkline';
 import { TrendChart } from '@/components/ui/TrendChart';
-import { Upload, AlertCircle, ArrowRight, Clock, Activity, Database, CheckCircle, AlertTriangle, RefreshCw, XCircle, Zap, Waves, TrendingUp, Shuffle, Dumbbell } from 'lucide-react';
+import { Upload, AlertCircle, ArrowRight, Clock, Activity, Database, CheckCircle, AlertTriangle, RefreshCw, XCircle, Zap, Waves, TrendingUp, Dumbbell, Shuffle, Server, HardDrive, BarChart3 } from 'lucide-react';
 
 const SPORT_ICONS: Record<string, typeof Activity> = {
-  'sport-cmj': Activity,
-  'sport-sprint': Zap,
-  'sport-swim': Waves,
-  'sport-hj': TrendingUp,
-  'sport-imtp': Dumbbell,
-  'sport-cod': Shuffle,
+  'sport-cmj': Activity, 'sport-sprint': Zap, 'sport-swim': Waves,
+  'sport-hj': TrendingUp, 'sport-imtp': Dumbbell, 'sport-cod': Shuffle,
 };
 
 export function HomePage() {
-  const { navigate, selectedTeamId, lang } = useApp();
-  const team = DEMO_TEAMS.find((t) => t.id === selectedTeamId) || DEMO_TEAMS[0];
-  const teamAthletes = DEMO_ATHLETES.filter((a) => a.teamId === selectedTeamId);
-  const attentionAthletes = teamAthletes.filter((a) => a.status === 'attention' || a.status === 'warning');
-  const recentSessions = [...DEMO_SESSIONS].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6);
-  const testedThisWeek = teamAthletes.filter((a) => a.lastTestDate).length;
-  const pendingTests = teamAthletes.length - testedThisWeek;
-  const onlineDevices = DEMO_DEVICES.filter((d) => d.status !== 'offline').length;
-  const syncIssues = DEMO_SYNC_LOGS.filter((s) => s.status !== 'success').length;
+  const { navigate, lang } = useApp();
+  const [perfProtocol, setPerfProtocol] = useState('all');
+  const [perfMetric, setPerfMetric] = useState('jump_height');
 
-  const avgJumpHeight = teamAthletes
-    .map((a) => getSessionsForAthlete(a.id).find((s) => s.sportId === 'sport-cmj')?.summary.jump_height)
-    .filter((v): v is number => v !== undefined);
-  const teamTrend = avgJumpHeight.length > 0 ? [
-    { label: lang === 'cn' ? '5月' : 'May', value: 44.2 },
-    { label: lang === 'cn' ? '6月' : 'Jun', value: 45.8 },
-    { label: lang === 'cn' ? '7月' : 'Jul', value: 46.5 },
-    { label: lang === 'cn' ? '8月' : 'Aug', value: 47.1 },
-    { label: lang === 'cn' ? '9月' : 'Sep', value: avgJumpHeight.reduce((a, b) => a + b, 0) / avgJumpHeight.length },
-  ] : [];
+  const allAthletes = DEMO_ATHLETES;
+  const attentionAthletes = allAthletes.filter((a) => a.status === 'attention' || a.status === 'warning');
+  const recentSessions = [...DEMO_SESSIONS].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8);
+
+  const today = new Date();
+  const todayStr = today.toDateString();
+  const testsToday = DEMO_SESSIONS.filter((s) => new Date(s.date).toDateString() === todayStr).length;
+
+  const processingQueue = DEMO_SESSIONS.filter((s) =>
+    s.sessionStatus === 'RECEIVED' || s.sessionStatus === 'VALIDATING' ||
+    s.sessionStatus === 'PROCESSING' || s.sessionStatus === 'QUEUED'
+  ).length;
+
+  const failedSessions = DEMO_SESSIONS.filter((s) =>
+    s.sessionStatus === 'UPLOAD_FAILED' || s.sessionStatus === 'VALIDATION_FAILED' || s.sessionStatus === 'PROCESSING_FAILED'
+  ).length;
+
+  const onlineSources = DEMO_DATA_SOURCES.filter((ds) => ds.status === 'connected').length;
+
+  const allMetrics = DEMO_PROTOCOLS.flatMap((p) => p.metrics).filter((m, i, arr) => arr.findIndex((x) => x.key === m.key) === i);
+
+  const perfSessions = perfProtocol === 'all' ? DEMO_SESSIONS : DEMO_SESSIONS.filter((s) => s.protocolId === perfProtocol);
+  const perfTrend = perfSessions.slice().reverse().map((s) => ({
+    label: new Date(s.date).toLocaleDateString(lang === 'cn' ? 'zh-CN' : 'en-US', { month: 'short', day: 'numeric' }),
+    value: s.summary[perfMetric] || Object.values(s.summary)[0] || 0,
+  }));
+
+  const metricUnit = allMetrics.find((m) => m.key === perfMetric)?.unit || '';
 
   return (
     <div>
       <TopBar
         title={tr('nav.home', lang)}
-        subtitle={`${lang === 'cn' ? team.nameCn : team.name} · ${team.season} ${lang === 'cn' ? '赛季' : 'season'}`}
+        subtitle={lang === 'cn' ? '组织级数据平台概览' : 'Organization-level data platform overview'}
         actions={
           <button
             onClick={() => navigate('data')}
@@ -56,27 +68,43 @@ export function HomePage() {
       />
       <div className="p-6 space-y-6">
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricCard label={tr('home.athletes', lang)} value={teamAthletes.length} delta={0} deltaLabel={tr('home.active', lang)} sparkData={[8, 8, 8, 8]} status="normal" />
-          <MetricCard label={tr('home.testedThisWeek', lang)} value={testedThisWeek} delta={pendingTests > 0 ? -pendingTests : 0} deltaLabel={`${pendingTests} ${tr('home.pending', lang)}`} status={pendingTests > 2 ? 'warning' : 'normal'} sparkData={[3, 5, 4, 6]} />
-          <MetricCard label={tr('home.attentionFlags', lang)} value={attentionAthletes.length} delta={0} deltaLabel={tr('home.needsReview', lang)} status={attentionAthletes.length > 2 ? 'attention' : 'warning'} sparkData={[1, 2, 3, 2]} />
-          <MetricCard label={tr('home.dataSync', lang)} value={onlineDevices + '/' + DEMO_DEVICES.length} delta={syncIssues > 0 ? -syncIssues : 0} deltaLabel={syncIssues > 0 ? tr('home.syncIssues', lang) : tr('home.syncHealthy', lang)} status={syncIssues > 0 ? 'warning' : 'normal'} sparkData={[4, 3, 4, 4]} />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <MetricCard label={lang === 'cn' ? '受试者' : 'Subjects'} value={allAthletes.length} status="normal" />
+          <MetricCard label={lang === 'cn' ? '测试记录' : 'Sessions'} value={DEMO_SESSIONS.length} status="normal" />
+          <MetricCard label={tr('home.testsToday', lang)} value={testsToday} status="normal" />
+          <MetricCard label={tr('home.processingQueue', lang)} value={processingQueue} status={processingQueue > 0 ? 'warning' : 'normal'} />
+          <MetricCard label={tr('home.failedSessions', lang)} value={failedSessions} status={failedSessions > 0 ? 'attention' : 'normal'} />
         </div>
 
+        {/* Performance Overview + Attention List */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Team Trend */}
           <div className="lg:col-span-2 bg-white rounded-xl border border-ink-200 p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-ink-900">{lang === 'cn' ? '队伍跳跃高度趋势' : 'Team Jump Height Trend'}</h3>
-                <p className="text-xs text-ink-500">{lang === 'cn' ? '全队平均CMJ跳跃高度' : 'Average CMJ jump height across all athletes'}</p>
+                <h3 className="text-sm font-semibold text-ink-900">{tr('home.performanceOverview', lang)}</h3>
+                <p className="text-xs text-ink-500">{lang === 'cn' ? '按方案和指标查看趋势' : 'Configurable by protocol and metric'}</p>
               </div>
-              <TrendingUp className="w-5 h-5 text-teal-600" />
+              <div className="flex items-center gap-2">
+                <select value={perfProtocol} onChange={(e) => setPerfProtocol(e.target.value)} className="text-xs bg-white border border-ink-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                  <option value="all">{tr('sessions.allProtocols', lang)}</option>
+                  {DEMO_PROTOCOLS.map((p) => (
+                    <option key={p.id} value={p.id}>{lang === 'cn' ? p.nameCn : p.name}</option>
+                  ))}
+                </select>
+                <select value={perfMetric} onChange={(e) => setPerfMetric(e.target.value)} className="text-xs bg-white border border-ink-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                  {allMetrics.map((m) => (
+                    <option key={m.key} value={m.key}>{lang === 'cn' ? m.nameCn : m.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <TrendChart data={teamTrend} unit="cm" height={200} baseline={45} color="#06b56b" />
+            {perfTrend.length > 1 ? (
+              <TrendChart data={perfTrend} unit={metricUnit} height={200} color="#06b56b" />
+            ) : (
+              <div className="h-[200px] flex items-center justify-center text-ink-400 text-sm">{tr('trends.noData', lang)}</div>
+            )}
           </div>
 
-          {/* Attention List */}
           <div className="bg-white rounded-xl border border-ink-200 p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-ink-900">{tr('home.needsAttention', lang)}</h3>
@@ -88,7 +116,6 @@ export function HomePage() {
               ) : (
                 attentionAthletes.map((athlete) => {
                   const sport = getSport(athlete.sportId);
-                  const SportIcon = sport ? SPORT_ICONS[sport.id] || Activity : Activity;
                   return (
                     <button
                       key={athlete.id}
@@ -109,14 +136,14 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Multi-Sport Recent Sessions */}
+        {/* Recent Activity */}
         <div className="bg-white rounded-xl border border-ink-200 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-ink-100">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-ink-500" />
-              <h3 className="text-sm font-semibold text-ink-900">{tr('home.recentSessions', lang)}</h3>
+              <h3 className="text-sm font-semibold text-ink-900">{tr('home.recentActivity', lang)}</h3>
             </div>
-            <button onClick={() => navigate('athletes')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">
+            <button onClick={() => navigate('sessions')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">
               {tr('common.viewAll', lang)}
             </button>
           </div>
@@ -158,22 +185,46 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Data Sync Status Mini-Panel */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Data Infrastructure */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl border border-ink-200 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-ink-900">{lang === 'cn' ? '设备状态' : 'Device Status'}</h3>
-              <button onClick={() => navigate('management')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">{tr('common.viewAll', lang)}</button>
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4 text-teal-600" />
+                <h3 className="text-sm font-semibold text-ink-900">{lang === 'cn' ? '数据源' : 'Data Sources'}</h3>
+              </div>
+              <button onClick={() => navigate('data-sources')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">{tr('common.viewAll', lang)}</button>
             </div>
             <div className="space-y-2">
-              {DEMO_DEVICES.map((device) => (
-                <div key={device.id} className="flex items-center gap-3 py-2 border-b border-ink-50 last:border-0">
-                  <StatusDot status={device.status} size="sm" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-ink-800 truncate">{device.serialNumber}</p>
-                    <p className="text-xs text-ink-400">{device.type} · {device.location}</p>
-                  </div>
-                  <span className="text-xs text-ink-400">{device.battery > 0 ? `${device.battery}%` : '—'}</span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-600">{lang === 'cn' ? '已连接' : 'Connected'}</span>
+                <span className="font-mono font-medium text-success-600">{onlineSources} / {DEMO_DATA_SOURCES.length}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-600">{lang === 'cn' ? '断开' : 'Disconnected'}</span>
+                <span className="font-mono font-medium text-ink-500">{DEMO_DATA_SOURCES.filter((ds) => ds.status === 'disconnected').length}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-600">{lang === 'cn' ? '错误' : 'Errors'}</span>
+                <span className="font-mono font-medium text-invalid-600">{DEMO_DATA_SOURCES.filter((ds) => ds.status === 'error').length}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-ink-200 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 text-teal-600" />
+                <h3 className="text-sm font-semibold text-ink-900">{lang === 'cn' ? '同步队列' : 'Sync Queue'}</h3>
+              </div>
+              <button onClick={() => navigate('sync-center')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">{tr('common.viewAll', lang)}</button>
+            </div>
+            <div className="space-y-2">
+              {DEMO_SYNC_JOBS.slice(0, 4).map((job) => (
+                <div key={job.id} className="flex items-center gap-2 text-sm">
+                  <StatusDot status={job.sessionStatus === 'PUBLISHED' ? 'normal' : job.sessionStatus.includes('FAILED') ? 'invalid' : 'processing'} size="sm" />
+                  <span className="text-ink-700 flex-1 truncate">{job.sourceName}</span>
+                  <span className="text-xs text-ink-400 font-mono">{job.recordsProcessed}/{job.recordsTotal}</span>
                 </div>
               ))}
             </div>
@@ -181,28 +232,25 @@ export function HomePage() {
 
           <div className="bg-white rounded-xl border border-ink-200 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-ink-900">{lang === 'cn' ? '数据导入' : 'Data Imports'}</h3>
-              <button onClick={() => navigate('data')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">{tr('common.viewAll', lang)}</button>
+              <div className="flex items-center gap-2">
+                <HardDrive className="w-4 h-4 text-teal-600" />
+                <h3 className="text-sm font-semibold text-ink-900">{lang === 'cn' ? '原始数据' : 'Raw Data'}</h3>
+              </div>
+              <button onClick={() => navigate('raw-data')} className="text-sm text-teal-600 hover:text-teal-700 font-medium">{tr('common.viewAll', lang)}</button>
             </div>
             <div className="space-y-2">
-              {DEMO_IMPORTS.slice(0, 4).map((job) => {
-                const Icon = job.status === 'completed' ? CheckCircle : job.status === 'failed' ? XCircle : job.status === 'processing' ? RefreshCw : AlertTriangle;
-                const color = job.status === 'completed' ? 'text-success-600' : job.status === 'failed' ? 'text-invalid-600' : job.status === 'processing' ? 'text-teal-600' : 'text-warning-600';
-                return (
-                  <div key={job.id} className="flex items-center gap-3 py-2 border-b border-ink-50 last:border-0">
-                    <Icon className={`w-4 h-4 shrink-0 ${color} ${job.status === 'processing' ? 'animate-sync-spin' : ''}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-ink-800 truncate">{job.fileName}</p>
-                      <p className="text-xs text-ink-400">{job.processedRows}/{job.totalRows} {tr('data.rows', lang)}</p>
-                    </div>
-                    {job.status === 'processing' && (
-                      <div className="w-16 h-1.5 bg-ink-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-teal-500 rounded-full transition-all" style={{ width: `${job.progress}%` }} />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-600">{lang === 'cn' ? '原始记录' : 'Raw Records'}</span>
+                <span className="font-mono font-medium text-ink-700">{DEMO_RAW_MEASUREMENTS.length}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-600">{lang === 'cn' ? '数据集' : 'Datasets'}</span>
+                <span className="font-mono font-medium text-ink-700">{DEMO_SESSIONS.length}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-600">{lang === 'cn' ? '设备' : 'Devices'}</span>
+                <span className="font-mono font-medium text-ink-700">{DEMO_DEVICES.length}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ const CAPTURE_MODE_LABELS: Record<string, { en: string; cn: string }> = {
 };
 
 export function ProtocolsPage() {
-  const { lang } = useApp();
+  const { lang, navigate } = useApp();
   const [search, setSearch] = useState('');
   const [sportFilter, setSportFilter] = useState('all');
 
@@ -74,7 +74,8 @@ export function ProtocolsPage() {
             return (
               <div
                 key={protocol.id}
-                className="bg-white rounded-xl border border-ink-200 p-5 hover:border-ink-300 hover:shadow-md transition-all group cursor-default"
+                onClick={() => navigate('protocol-detail', { protocolId: protocol.id })}
+                className="bg-white rounded-xl border border-ink-200 p-5 hover:border-teal-300 hover:shadow-md transition-all group cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-11 h-11 rounded-xl bg-ink-50 flex items-center justify-center">

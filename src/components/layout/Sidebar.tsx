@@ -1,30 +1,137 @@
+import { useState } from 'react';
 import { useApp } from '@/lib/app-context';
 import { t as tr } from '@/lib/i18n';
 import { DEMO_ORG } from '@/lib/demo-data';
-import { Activity, Users, ClipboardList, Database, BarChart3, FileText, Settings, ChevronRight, FlaskConical, LayoutDashboard, BookOpen } from 'lucide-react';
+import {
+  Activity, LayoutDashboard, Users, ClipboardList, BarChart3,
+  TrendingUp, GitCompare, Waves, FileText, Database, Server,
+  HardDrive, BookOpen, Plug, RefreshCw, ChevronDown, ChevronRight,
+  Building2, UserCog, ShieldCheck, UsersRound, Cpu, Settings,
+  FlaskConical, type LucideIcon,
+} from 'lucide-react';
 import { StatusDot } from '@/components/ui/StatusBadge';
+
+interface NavItem {
+  view: string;
+  label: string;
+  icon: LucideIcon;
+  matchViews?: string[];
+}
+
+interface NavGroup {
+  id: string;
+  labelKey: string;
+  items: NavItem[];
+}
 
 export function Sidebar() {
   const { currentView, navigate, lang } = useApp();
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-  const navItems = [
-    { view: 'home', label: tr('nav.home', lang), icon: LayoutDashboard },
-    { view: 'athletes', label: tr('nav.athletes', lang), icon: Users },
-    { view: 'sessions', label: tr('nav.sessions', lang), icon: ClipboardList },
-    { view: 'protocols', label: tr('nav.protocols', lang), icon: BookOpen },
-    { view: 'data', label: tr('nav.data', lang), icon: Database },
-    { view: 'dashboard', label: tr('nav.dashboard', lang), icon: BarChart3 },
-    { view: 'reports', label: tr('nav.reports', lang), icon: FileText },
-    { view: 'management', label: tr('nav.management', lang), icon: Settings },
+  const toggleGroup = (id: string) => {
+    setCollapsedGroups((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const topItem: NavItem = {
+    view: 'home',
+    label: tr('nav.home', lang),
+    icon: LayoutDashboard,
+  };
+
+  const groups: NavGroup[] = [
+    {
+      id: 'data',
+      labelKey: 'nav.group.data',
+      items: [
+        { view: 'athletes', label: tr('nav.athletes', lang), icon: Users, matchViews: ['athletes', 'athlete-profile'] },
+        { view: 'sessions', label: tr('nav.sessions', lang), icon: ClipboardList, matchViews: ['sessions', 'session-detail'] },
+        { view: 'results', label: tr('nav.results', lang), icon: BarChart3, matchViews: ['results', 'result-detail'] },
+        { view: 'datasets', label: tr('nav.datasets', lang), icon: Database, matchViews: ['datasets', 'dataset-detail'] },
+        { view: 'raw-data', label: tr('nav.rawData', lang), icon: HardDrive, matchViews: ['raw-data'] },
+        { view: 'data-sources', label: tr('nav.dataSources', lang), icon: Server, matchViews: ['data-sources', 'data-source-detail'] },
+      ],
+    },
+    {
+      id: 'analysis',
+      labelKey: 'nav.group.analysis',
+      items: [
+        { view: 'performance', label: tr('nav.performance', lang), icon: TrendingUp, matchViews: ['performance'] },
+        { view: 'trends', label: tr('nav.trends', lang), icon: TrendingUp, matchViews: ['trends'] },
+        { view: 'comparisons', label: tr('nav.comparisons', lang), icon: GitCompare, matchViews: ['comparisons'] },
+        { view: 'biomechanics', label: tr('nav.biomechanics', lang), icon: Waves, matchViews: ['biomechanics'] },
+        { view: 'dashboards', label: tr('nav.dashboards', lang), icon: LayoutDashboard, matchViews: ['dashboards'] },
+      ],
+    },
+    {
+      id: 'platform',
+      labelKey: 'nav.group.platform',
+      items: [
+        { view: 'protocols', label: tr('nav.protocols', lang), icon: BookOpen, matchViews: ['protocols', 'protocol-detail'] },
+        { view: 'reports', label: tr('nav.reports', lang), icon: FileText, matchViews: ['reports'] },
+        { view: 'integrations', label: tr('nav.integrations', lang), icon: Plug, matchViews: ['integrations'] },
+        { view: 'sync-center', label: tr('nav.syncCenter', lang), icon: RefreshCw, matchViews: ['sync-center'] },
+      ],
+    },
+    {
+      id: 'admin',
+      labelKey: 'nav.group.admin',
+      items: [
+        { view: 'organization', label: tr('nav.organization', lang), icon: Building2, matchViews: ['organization'] },
+        { view: 'users', label: tr('nav.users', lang), icon: UserCog, matchViews: ['users'] },
+        { view: 'roles', label: tr('nav.roles', lang), icon: ShieldCheck, matchViews: ['roles'] },
+        { view: 'teams', label: tr('nav.teams', lang), icon: UsersRound, matchViews: ['teams'] },
+        { view: 'devices', label: tr('nav.devices', lang), icon: Cpu, matchViews: ['devices'] },
+        { view: 'settings', label: tr('nav.settings', lang), icon: Settings, matchViews: ['settings'] },
+      ],
+    },
   ];
 
-  const isActive = (view: string) => {
-    if (view === 'athletes') return currentView === 'athletes' || currentView === 'athlete-profile';
-    if (view === 'sessions') return currentView === 'sessions' || currentView === 'session-detail';
-    if (view === 'protocols') return currentView === 'protocols';
-    if (view === 'data') return currentView === 'data' || currentView === 'integrations' || currentView === 'sync-center';
-    if (view === 'management') return currentView === 'management';
-    return currentView === view;
+  const isItemActive = (item: NavItem) => {
+    const matchViews = item.matchViews || [item.view];
+    return matchViews.includes(currentView);
+  };
+
+  const isGroupActive = (group: NavGroup) => group.items.some(isItemActive);
+
+  const renderItem = (item: NavItem) => {
+    const Icon = item.icon;
+    const active = isItemActive(item);
+    return (
+      <button
+        key={item.view}
+        onClick={() => navigate(item.view)}
+        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+          active ? 'bg-teal-500 text-white' : 'text-kunwei-200 hover:bg-kunwei-900 hover:text-white'
+        }`}
+      >
+        <Icon className="shrink-0" style={{ width: 16, height: 16 }} />
+        <span className="truncate">{item.label}</span>
+        {active && <ChevronRight className="w-3.5 h-3.5 ml-auto shrink-0" />}
+      </button>
+    );
+  };
+
+  const renderGroup = (group: NavGroup) => {
+    const collapsed = collapsedGroups[group.id];
+    const groupActive = isGroupActive(group);
+    return (
+      <div key={group.id}>
+        <button
+          onClick={() => toggleGroup(group.id)}
+          className={`w-full flex items-center gap-2 px-3 pt-4 pb-1.5 text-[11px] font-semibold tracking-wider transition-colors ${
+            groupActive ? 'text-teal-400' : 'text-kunwei-400 hover:text-kunwei-200'
+          }`}
+        >
+          <ChevronDown className={`w-3 h-3 transition-transform shrink-0 ${collapsed ? '-rotate-90' : ''}`} />
+          {tr(group.labelKey, lang)}
+        </button>
+        {!collapsed && (
+          <div className="space-y-0.5">
+            {group.items.map(renderItem)}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -41,24 +148,9 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-thin">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.view);
-          return (
-            <button
-              key={item.view}
-              onClick={() => navigate(item.view)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                active ? 'bg-teal-500 text-white' : 'text-kunwei-200 hover:bg-kunwei-900 hover:text-white'
-              }`}
-            >
-              <Icon className="shrink-0" style={{ width: 18, height: 18 }} />
-              {item.label}
-              {active && <ChevronRight className="w-4 h-4 ml-auto" />}
-            </button>
-          );
-        })}
+      <nav className="flex-1 px-3 py-2 overflow-y-auto scrollbar-thin">
+        {renderItem(topItem)}
+        {groups.map(renderGroup)}
       </nav>
 
       <div className="px-3 py-3 border-t border-kunwei-900 space-y-2">

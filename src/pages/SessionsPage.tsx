@@ -6,7 +6,7 @@ import { DEMO_SESSIONS, DEMO_ATHLETES, DEMO_PROTOCOLS, DEMO_DATA_SOURCES, getSpo
 import { TopBar } from '@/components/layout/TopBar';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Upload, Search, Activity, Zap, Waves, TrendingUp, Dumbbell, Shuffle, ChevronRight, CheckCircle, XCircle, RefreshCw, AlertCircle } from 'lucide-react';
+import { Upload, Search, Activity, Zap, Waves, TrendingUp, Dumbbell, Shuffle, ChevronRight, CheckCircle, XCircle, RefreshCw, AlertCircle, Download, MoreVertical, FileText, BarChart3 } from 'lucide-react';
 import type { TestSession, SessionStatus } from '@/lib/types';
 
 const SPORT_ICONS: Record<string, typeof Activity> = {
@@ -38,6 +38,7 @@ export function SessionsPage() {
   const [protocolFilter, setProtocolFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
 
   const filteredSessions = useMemo(() => {
     return DEMO_SESSIONS.filter((s) => {
@@ -47,9 +48,16 @@ export function SessionsPage() {
       const matchesProtocol = protocolFilter === 'all' || s.protocolId === protocolFilter;
       const matchesStatus = statusFilter === 'all' || s.sessionStatus === statusFilter;
       const matchesSource = sourceFilter === 'all' || s.dataSourceId === sourceFilter;
-      return matchesSearch && matchesProtocol && matchesStatus && matchesSource;
+      const matchesDate = dateFilter === 'all' || (() => {
+        const days = parseInt(dateFilter);
+        const sessionDate = new Date(s.date);
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - days);
+        return sessionDate >= cutoff;
+      })();
+      return matchesSearch && matchesProtocol && matchesStatus && matchesSource && matchesDate;
     }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [search, protocolFilter, statusFilter, sourceFilter]);
+  }, [search, protocolFilter, statusFilter, sourceFilter, dateFilter]);
 
   const getPrimaryResult = (session: TestSession): string => {
     const protocol = getProtocol(session.protocolId);
@@ -119,6 +127,12 @@ export function SessionsPage() {
             {sourceOptions.map((s) => (
               <option key={s.id} value={s.id}>{lang === 'cn' ? s.nameCn : s.name}</option>
             ))}
+          </select>
+          <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="text-sm bg-white border border-ink-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all">
+            <option value="all">{tr('common.allTime', lang)}</option>
+            <option value="7">{tr('common.last7days', lang)}</option>
+            <option value="30">{tr('common.last30days', lang)}</option>
+            <option value="90">{tr('common.last90days', lang)}</option>
           </select>
         </div>
 
@@ -228,13 +242,7 @@ export function SessionsPage() {
                 header: '',
                 align: 'right',
                 render: (s) => (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); navigate('session-detail', { sessionId: s.id }); }}
-                    className="p-1.5 text-ink-400 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
-                    title={tr('common.viewSession', lang)}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <SessionRowActions session={s} lang={lang} navigate={navigate} addToast={addToast} />
                 ),
               },
             ]}
@@ -245,6 +253,57 @@ export function SessionsPage() {
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+function SessionRowActions({ session, lang, navigate, addToast }: {
+  session: TestSession;
+  lang: 'en' | 'cn';
+  navigate: (view: string, params?: Record<string, string>) => void;
+  addToast: (msg: string, type?: 'success' | 'warning' | 'attention' | 'info') => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const isFailed = session.sessionStatus.includes('FAILED');
+  const isPublished = session.sessionStatus === 'PUBLISHED' || session.sessionStatus === 'ANALYZED';
+
+  const actions = [
+    { icon: ChevronRight, label: tr('common.viewSession', lang), onClick: () => navigate('session-detail', { sessionId: session.id }) },
+    { icon: Download, label: tr('common.download', lang), onClick: () => addToast(lang === 'cn' ? '下载（演示）' : 'Download (demo)', 'info') },
+    ...(isFailed ? [{ icon: RefreshCw, label: tr('common.retryProcessing', lang), onClick: () => addToast(lang === 'cn' ? '重试处理（演示）' : 'Retry processing (demo)', 'info') }] : []),
+    { icon: Activity, label: tr('common.viewRawData', lang), onClick: () => navigate('raw-data') },
+    ...(isPublished ? [{ icon: BarChart3, label: tr('common.viewAnalysis', lang), onClick: () => navigate('result-detail', { sessionId: session.id }) }] : []),
+    ...(isPublished ? [{ icon: FileText, label: tr('common.generateReport', lang), onClick: () => navigate('reports') }] : []),
+  ];
+
+  return (
+    <div className="relative" onClick={(e) => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="p-1.5 text-ink-400 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
+      >
+        <MoreVertical className="w-4 h-4" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-1 z-20 bg-white rounded-lg border border-ink-200 shadow-lg py-1 min-w-[180px]">
+            {actions.map((action, i) => {
+              const Icon = action.icon;
+              return (
+                <button
+                  key={i}
+                  onClick={() => { action.onClick(); setOpen(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-ink-50 transition-colors text-left"
+                >
+                  <Icon className="w-3.5 h-3.5 text-ink-400" />
+                  {action.label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
